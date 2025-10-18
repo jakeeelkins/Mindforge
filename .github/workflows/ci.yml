@@ -34,14 +34,13 @@ jobs:
           ruff check app --exit-zero
 
       - name: Run tests
+        shell: bash
         run: |
           pip install pytest >/dev/null 2>&1 || true
           if [ -d "tests" ]; then
             pytest -q
           else
-            python - <<'PY'
-print("No tests yet — add pytest later.")
-PY
+            python -c 'print("No tests yet - add pytest later.")'
           fi
 
       - name: Build Docker image
@@ -66,16 +65,11 @@ PY
       - name: Build and push image
         env:
           IMAGE: ghcr.io/${{ github.repository_owner }}/hello-world-app
+        shell: bash
         run: |
-          TAG=${GITHUB_SHA::7}
+          TAG=${GITHUB_SHA:0:7}
           echo "Building image: $IMAGE:$TAG"
           docker build -t "$IMAGE:$TAG" -t "$IMAGE:latest" .
           docker push "$IMAGE:$TAG"
           docker push "$IMAGE:latest"
-          echo "✅ Image pushed successfully!"
-
-
-
-
-
-
+          echo "Image pushed successfully."

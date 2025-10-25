@@ -1,0 +1,4 @@
+sku,location,name,on_hand,daily_demand,lead_time_days,min_threshold
+SKU-001,A,Widget Small,8,5,3,2
+SKU-002,A,Gadget Large,40,5,5,10
+SKU-003,B,Broken Part,0,1,7,1

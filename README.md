@@ -1,38 +1,38 @@
-# Team Development Environment
+# Capstone: Intelligent Stock Alert System
 
-This repository bootstraps a complete development environment with:
-- Version control and Git branching strategy
-- Linux-based dev servers (Dockerized services)
-- Containerization via Docker & Compose
-- CI/CD pipeline (GitHub Actions) with build/test/lint and deploy jobs
-- Three environments: **development**, **staging**, **production**
-- Access provisioning checklist
-- "Hello World" application to prove deployment
+This project implements a minimal alerting service for low stock levels with restocking recommendations.
+It includes threshold detection, de-duplication, escalation policy, delivery adapters, alert history tables, and a small API/UI for demos.
 
-## Quick start (local dev)
+## Features
+- Threshold-based alerts with simple ROP (reorder point) logic
+- De-duplication (one open alert per SKU/location/severity band)
+- Step-based escalation policy (console → email → slack)
+- Delivery logging (success/failure) and alert event history
+- REST API (FastAPI) and optional demo UI (Streamlit)
+
+## Quickstart (API)
 ```bash
-# 1) Clone and bootstrap
-git clone <YOUR-REPO-URL> team-dev-env
-cd team-dev-env
-cp .env.example .env
-
-# 2) Start services
-docker compose -f infra/docker-compose.dev.yml up --build
-
-# 3) Visit the app
-# Backend: http://localhost:8000
-# Health:  http://localhost:8000/health
+python -m venv .venv && source .venv/bin/activate   # or .venv\Scripts\activate on Windows
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+# Visit http://127.0.0.1:8000/docs
 ```
 
-## Branching strategy (GitHub Flow with env gates)
-- `main`: production
-- `staging`: staging
-- feature branches: `feat/<short-desc>`
-- fix branches: `fix/<short-desc>`
+## Demo UI (Streamlit)
+```bash
+streamlit run app/streamlit_app.py
+```
 
-**Rules**
-- Feature → PR into `staging` (CI must pass)
-- Release: `staging` → `main` via PR (tagged)
-- Hotfix: `fix/*` → `main` with back-merge into `staging`
+## API Endpoints
+- `POST /inventory` — Evaluate list of inventory items for alerts
+- `GET /alerts?status=open` — List alerts (filter by status)
+- `POST /alerts/{id}/ack` — Acknowledge an alert
+- `POST /alerts/{id}/resolve` — Resolve an alert
+- `POST /escalations/run` — Process due escalations
 
-See `docs/BRANCHING.md` for details.
+## CSV Columns (for Streamlit)
+`sku,location,name,on_hand,daily_demand,lead_time_days,min_threshold`
+
+## Notes
+- SQLite file `alerts.db` is created in the working directory.
+- Email/Slack adapters are included but disabled by default; configure them in `app/main.py`.
